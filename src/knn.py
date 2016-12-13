@@ -14,3 +14,6 @@ def getNeighbors(dataSet, instance, k):
 	 
 def predictLabel(dataSet, instance, k):
 	return Counter([i[-1] for i in getNeighbors(dataSet,instance,k)]).most_common()[0][0]
+
+#def everything(dataSet, instance, k):
+	#return Counter([i[-1] for i in sorted([(sum([(instance[n]-j[n])**2 for n in range(len(instance))])**.5,j[-1]) for j in dataSet])[:k].most_common()[0][0]
