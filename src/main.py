@@ -85,14 +85,12 @@ def main():
                     center = ((minX + maxX) / 2, (minY + maxY) / 2)
                     origin = (minX, minY)
                     zoom = max(totalSize)
-                    # (x-origin)*zoom/totalX
-                    # TODO: update scaling to use only one axis and center it
-                    adjustedStrokes = [[((i[0]-origin[0])*zoom/totalSize[0], (i[1]-origin[1])*zoom/totalSize[1]) for i in j] for j in strokes]
+                    adjustedStrokes = [[((i[0] - center[0]) * 32 * screenSize / zoom + 16 * screenSize, (i[1] - center[1]) * 32 * screenSize / zoom + 16 * screenSize) for i in j] for j in strokes]
                 else:
                     penDown = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    #print knn.predictLabel(trainingSet + testSet, heatmap, 1)
+                    # print knn.predictLabel(trainingSet + testSet, heatmap, 1)
                     minY = maxY = minX = maxX = 0
                     strokes = [[]]
                     adjustedStrokes = [[]]
@@ -133,7 +131,6 @@ def main():
         for i in strokes:
             for j in i:
                 screen.set_at(j, red)
-                #pygame.draw.circle(screen, red, j, 1)
 
         # vectorized, normalized, and scaled
         pygame.draw.rect(pixelated, white, (0, 0, screenSize * 32, screenSize * 32))
