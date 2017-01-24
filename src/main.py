@@ -20,6 +20,27 @@ def runKNNTest():
     print str(correct * 100 / len(testSet)) + "% correct"
 
 
+def runKNNTestWeighted():
+    w = [[.5, .5, .5, .5, .5, .5, .5, .5],
+         [.5, .5, .5, 1, 1, .5, .5, .5],
+         [.5, .5, 1, 1, 1, 1, .5, .5],
+         [.5, 1, 1, 2, 2, 1, 1, .5],
+         [.5, 1, 1, 2, 2, 1, 1, .5],
+         [.5, .5, 1, 1, 1, 1, .5, .5],
+         [.5, .5, .5, 1, 1, .5, .5, .5],
+         [.5, .5, .5, .5, .5, .5, .5, .5]]
+    w = [x for i in w for x in i]
+    correct = 0.
+    percentage = 0
+    for i in range(len(testSet)):
+        if i * 100 / len(testSet) > percentage:
+            percentage = i * 100 / len(testSet)
+            print '{0}\r'.format("Progress: " + str(percentage) + "%"),
+        prediction = knn.predictLabelWeighted(trainingSet, testSet[i][:-1], 1, w)
+        correct += prediction == testSet[i][-1]
+    print str(correct * 100 / len(testSet)) + "% correct"
+
+
 def convertImageToData(n):
     results = []
     for x in range(8):
@@ -50,6 +71,8 @@ def main():
     black = 0, 0, 0
     red = 255, 0, 0
     green = 0, 255, 0
+    myfont = pygame.font.SysFont("Arial", 200)
+    textsurface = myfont.render('', False, black)
     board = [[0 for i in range(32)] for j in range(32)]
     heatmap = convertImageToData(board)
     averageHeatmap = convertImageToData(board)
@@ -118,11 +141,12 @@ def main():
                 prediction = knn.getNeighborData(trainingSet + testSet, heatmap)
                 closestHeatmap = prediction
                 averageHeatmap = avg[prediction[-1]]
+            textsurface = myfont.render(str(prediction[-1]), False, black)
 
         screen.fill((100, 100, 100))
+        pygame.draw.rect(screen, white, (0, 0, screenSize * 96, screenSize * 64))
 
         # vectorized
-        pygame.draw.rect(screen, white, (0, 0, screenSize * 96, screenSize * 64))
         if maxX != 0 or maxY != 0:
             pygame.draw.line(screen, green, (minX, minY), (minX, maxY))
             pygame.draw.line(screen, green, (maxX, minY), (maxX, maxY))
@@ -160,15 +184,18 @@ def main():
             pygame.draw.rect(screen, (c, c, c), (32 * screenSize + (i % 8) * screenSize * 4, 64 * screenSize + (i / 8) * screenSize * 4, screenSize * 4, screenSize * 4))
 
         # finalCharacter font draw/print
+        screen.blit(textsurface, (76 * screenSize, 32 * screenSize))
 
+        # dividing lines
         pygame.draw.line(screen, red, (32 * screenSize, 0), (32 * screenSize, 64 * screenSize))
         pygame.draw.line(screen, red, (64 * screenSize, 0), (64 * screenSize, 64 * screenSize))
         pygame.draw.line(screen, red, (0, 32 * screenSize), (96 * screenSize, 32 * screenSize))
 
         pygame.display.flip()
 
-# runKNNTest()
-main()
+if __name__ == "__main__":
+    runKNNTestWeighted()
+    # main()
 
 # vector input or image      raw input scaled      32x32
 # 8x8                        closest               average or example raw
